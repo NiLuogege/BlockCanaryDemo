@@ -114,6 +114,8 @@ public class BlockCanaryContext implements BlockInterceptor {
      * the period specified here (especially when cpu is busier).
      * </p>
      *
+     * 堆栈采样间隔 默认 1000 ms
+     *
      * @return dump interval (in millis)
      */
     public int provideDumpInterval() {

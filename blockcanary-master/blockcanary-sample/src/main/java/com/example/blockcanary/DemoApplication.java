@@ -28,8 +28,10 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sContext = this;
-        //初始化 BlockCanary
-        BlockCanary.install(this, new AppContext()).start();
+        //初始化 BlockCanary ,主要是去 设置 推送是否可用 ，然后会创建一个 BlockCanary
+        BlockCanary blockCanary = BlockCanary.install(this, new AppContext());
+        //开始检测， 这里就会设置一个自定义的 Printer
+        blockCanary.start();
     }
 
     public static Context getAppContext() {

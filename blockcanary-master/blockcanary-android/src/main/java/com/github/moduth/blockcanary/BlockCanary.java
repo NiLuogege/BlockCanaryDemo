@@ -36,15 +36,22 @@ public final class BlockCanary {
 
     private static BlockCanary sInstance;
     private BlockCanaryInternals mBlockCanaryCore;
+    //检测是否启动
     private boolean mMonitorStarted = false;
 
     private BlockCanary() {
+        //设置Context
         BlockCanaryInternals.setContext(BlockCanaryContext.get());
+        //创建并获取 BlockCanaryInternals 也是个单例
         mBlockCanaryCore = BlockCanaryInternals.getInstance();
+        //设置 卡顿拦截器 ，一般用作全局处理卡顿的回调
         mBlockCanaryCore.addBlockInterceptor(BlockCanaryContext.get());
+
+        //如果不显示 推送，就不添加 DisplayService 了
         if (!BlockCanaryContext.get().displayNotification()) {
             return;
         }
+        //添加 DisplayService 这个拦截器
         mBlockCanaryCore.addBlockInterceptor(new DisplayService());
 
     }
@@ -61,7 +68,7 @@ public final class BlockCanary {
         BlockCanaryContext.init(context, blockCanaryContext);
         //设置 推送是否可用
         setEnabled(context, DisplayActivity.class, BlockCanaryContext.get().displayNotification());
-        //返回单里的 BlockCanary
+        //返回单例的 BlockCanary
         return get();
     }
 
@@ -83,10 +90,12 @@ public final class BlockCanary {
 
     /**
      * Start monitoring.
+     * 开始监测
      */
     public void start() {
         if (!mMonitorStarted) {
             mMonitorStarted = true;
+            //设置自定义的 Printer
             Looper.getMainLooper().setMessageLogging(mBlockCanaryCore.monitor);
         }
     }

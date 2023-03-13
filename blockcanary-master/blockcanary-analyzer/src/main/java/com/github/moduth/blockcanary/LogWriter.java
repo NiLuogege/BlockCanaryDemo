@@ -101,6 +101,8 @@ public class LogWriter {
         try {
             File file = BlockCanaryInternals.detectedBlockDirectory();
             long time = System.currentTimeMillis();
+
+            //文件名的格式为 Looper-yyyy-MM-dd_HH-mm-ss.SSS.log
             path = file.getAbsolutePath() + "/"
                     + logFileName + "-"
                     + FILE_NAME_FORMATTER.format(time) + ".log";

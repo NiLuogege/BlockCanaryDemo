@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * {@link AbstractSampler} sampler defines sampler work flow.
+ *
+ * 采样器抽象接口， 实现类有 CpuSampler , StackSampler
  */
 abstract class AbstractSampler {
 
@@ -39,6 +41,7 @@ abstract class AbstractSampler {
         }
     };
 
+    //用于设置 采样间隔的
     public AbstractSampler(long sampleInterval) {
         if (0 == sampleInterval) {
             sampleInterval = DEFAULT_SAMPLE_INTERVAL;

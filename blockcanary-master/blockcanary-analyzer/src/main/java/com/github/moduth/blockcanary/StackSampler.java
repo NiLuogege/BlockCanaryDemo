@@ -25,13 +25,16 @@ import java.util.LinkedHashMap;
  */
 class StackSampler extends AbstractSampler {
 
+    //最大的 存储个数？？？
     private static final int DEFAULT_MAX_ENTRY_COUNT = 100;
     private static final LinkedHashMap<Long, String> sStackMap = new LinkedHashMap<>();
 
     private int mMaxEntryCount = DEFAULT_MAX_ENTRY_COUNT;
     private Thread mCurrentThread;
 
-    public StackSampler(Thread thread, long sampleIntervalMillis) {
+    public StackSampler(Thread thread, //主线程也就是 ui线程
+                        long sampleIntervalMillis//堆栈采样间隔 默认1000 ms 也就是1s
+    ) {
         this(thread, DEFAULT_MAX_ENTRY_COUNT, sampleIntervalMillis);
     }
 

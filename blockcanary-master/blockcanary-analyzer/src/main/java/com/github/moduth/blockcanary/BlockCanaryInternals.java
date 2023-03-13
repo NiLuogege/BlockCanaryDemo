@@ -39,29 +39,44 @@ public final class BlockCanaryInternals {
 
     public BlockCanaryInternals() {
 
+        //创建一个 堆栈采样器 ， 并设置采样间隔
         stackSampler = new StackSampler(
                 Looper.getMainLooper().getThread(),
                 sContext.provideDumpInterval());
 
+        //创建一个 Cpu采样器
         cpuSampler = new CpuSampler(sContext.provideDumpInterval());
 
+        //创建一个 LooperMonitor ，并为 LooperMonitor 创建一个 BlockListener 就是发生卡顿以后该怎么办
         setMonitor(new LooperMonitor(new LooperMonitor.BlockListener() {
 
             @Override
-            public void onBlockEvent(long realTimeStart, long realTimeEnd,
-                                     long threadTimeStart, long threadTimeEnd) {
+            public void onBlockEvent(long realTimeStart,
+                                     long realTimeEnd,
+                                     long threadTimeStart,
+                                     long threadTimeEnd) {
                 // Get recent thread-stack entries and cpu usage
+                // 通过stackSampler 获取 realTimeStart 到 realTimeEnd 这段时间的堆栈情况
                 ArrayList<String> threadStackEntries = stackSampler
                         .getThreadStackEntries(realTimeStart, realTimeEnd);
                 if (!threadStackEntries.isEmpty()) {
+                    //创建一个 BlockInfo
                     BlockInfo blockInfo = BlockInfo.newInstance()
+                            //设置真实起始结束时间 和线程的 起始结束时间
                             .setMainThreadTimeCost(realTimeStart, realTimeEnd, threadTimeStart, threadTimeEnd)
+                            //设置cup是否繁忙
                             .setCpuBusyFlag(cpuSampler.isCpuBusy(realTimeStart, realTimeEnd))
+                            //设置CUP使用率
                             .setRecentCpuRate(cpuSampler.getCpuRateInfo())
+                            //设置堆栈信息
                             .setThreadStackEntries(threadStackEntries)
+                            //用于构建多个 StringBuilder ，并设置信息
                             .flushString();
+
+                    //日志写入到文件中
                     LogWriter.save(blockInfo.toString());
 
+                    //回调各个拦截器的 onBlock 方法并传入生成的 BlockInfo
                     if (mInterceptorChain.size() != 0) {
                         for (BlockInterceptor interceptor : mInterceptorChain) {
                             interceptor.onBlock(getContext().provideContext(), blockInfo);
@@ -115,6 +130,11 @@ public final class BlockCanaryInternals {
         return (long) (BlockCanaryInternals.getContext().provideBlockThreshold() * 0.8f);
     }
 
+    /**
+     * 如果SD卡可写则是在 SD卡的 \blockcanary 目录下
+     * 如果SK卡不可写则是在app的私有目录 files\blockcanary 目录下
+     * @return
+     */
     static String getPath() {
         String state = Environment.getExternalStorageState();
         String logPath = BlockCanaryInternals.getContext()
