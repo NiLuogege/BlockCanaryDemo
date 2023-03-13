@@ -55,17 +55,21 @@ class LooperMonitor implements Printer {
             mStartTimestamp = System.currentTimeMillis();
             mStartThreadTimestamp = SystemClock.currentThreadTimeMillis();
             mPrintingStarted = true;
+            //在子线程中获取调用栈和CPU信息
             startDump();
         } else {
             final long endTime = System.currentTimeMillis();
             mPrintingStarted = false;
+            //判断是否超过设置的阈值
             if (isBlock(endTime)) {
                 notifyBlockEvent(endTime);
             }
+            //停止获取调用栈和CPU信息
             stopDump();
         }
     }
 
+    //判断是否超过设置的阈值
     private boolean isBlock(long endTime) {
         return endTime - mStartTimestamp > mBlockThresholdMillis;
     }

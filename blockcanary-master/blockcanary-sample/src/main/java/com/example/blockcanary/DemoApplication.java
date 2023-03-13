@@ -28,6 +28,7 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sContext = this;
+        //初始化 BlockCanary
         BlockCanary.install(this, new AppContext()).start();
     }
 

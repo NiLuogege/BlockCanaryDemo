@@ -27,6 +27,9 @@ import android.widget.Button;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * 用于模拟主线程阻塞的
+ */
 public class DemoFragment extends Fragment implements View.OnClickListener {
 
     private static final String DEMO_FRAGMENT = "DemoFragment";

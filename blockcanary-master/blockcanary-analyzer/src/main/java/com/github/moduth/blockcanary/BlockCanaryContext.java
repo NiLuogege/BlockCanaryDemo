@@ -25,10 +25,14 @@ import java.util.List;
 
 /**
  * User should provide a real implementation of this class to use BlockCanary.
+ *
+ * 配置类，用于做一些自定义
+ *
  */
 public class BlockCanaryContext implements BlockInterceptor {
 
     private static Context sApplicationContext;
+    //用于保存用户自定义的 BlockCanaryContext
     private static BlockCanaryContext sInstance = null;
 
     public BlockCanaryContext() {
@@ -36,6 +40,7 @@ public class BlockCanaryContext implements BlockInterceptor {
 
     static void init(Context context, BlockCanaryContext blockCanaryContext) {
         sApplicationContext = context;
+        //用于保存用户自定义的 BlockCanaryContext
         sInstance = blockCanaryContext;
     }
 

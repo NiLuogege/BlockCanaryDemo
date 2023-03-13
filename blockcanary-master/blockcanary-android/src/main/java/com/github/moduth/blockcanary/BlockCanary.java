@@ -57,6 +57,7 @@ public final class BlockCanary {
      * @return {@link BlockCanary}
      */
     public static BlockCanary install(Context context, BlockCanaryContext blockCanaryContext) {
+        //初始化，只是在 BlockCanaryContext中保存了 Context 和 用于自定义的 BlockCanaryContext
         BlockCanaryContext.init(context, blockCanaryContext);
         setEnabled(context, DisplayActivity.class, BlockCanaryContext.get().displayNotification());
         return get();
