@@ -127,6 +127,7 @@ public final class BlockCanaryInternals {
         monitor = looperPrinter;
     }
 
+    //采样延时， 为啥要延时呀？？
     long getSampleDelay() {
         return (long) (BlockCanaryInternals.getContext().provideBlockThreshold() * 0.8f);
     }

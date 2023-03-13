@@ -60,9 +60,12 @@ class LooperMonitor implements Printer {
      */
     @Override
     public void println(String x) {
+        //debug 的时候不 监控
         if (mStopWhenDebugging && Debug.isDebuggerConnected()) {
             return;
         }
+
+        //输出开始的信息
         if (!mPrintingStarted) {
             mStartTimestamp = System.currentTimeMillis();
             mStartThreadTimestamp = SystemClock.currentThreadTimeMillis();
@@ -70,10 +73,12 @@ class LooperMonitor implements Printer {
             //在子线程中获取调用栈和CPU信息
             startDump();
         } else {
+            //输出结束的信息
             final long endTime = System.currentTimeMillis();
             mPrintingStarted = false;
             //判断是否超过设置的阈值
             if (isBlock(endTime)) {
+                //回调
                 notifyBlockEvent(endTime);
             }
             //停止获取调用栈和CPU信息
@@ -93,6 +98,7 @@ class LooperMonitor implements Printer {
         HandlerThreadFactory.getWriteLogThreadHandler().post(new Runnable() {
             @Override
             public void run() {
+                //异步线程回调 onBlockEvent
                 mBlockListener.onBlockEvent(startTime, endTime, startThreadTime, endThreadTime);
             }
         });
@@ -100,20 +106,24 @@ class LooperMonitor implements Printer {
 
     private void startDump() {
         if (null != BlockCanaryInternals.getInstance().stackSampler) {
+            //开始堆栈采样
             BlockCanaryInternals.getInstance().stackSampler.start();
         }
 
         if (null != BlockCanaryInternals.getInstance().cpuSampler) {
+            //开始cpu采样
             BlockCanaryInternals.getInstance().cpuSampler.start();
         }
     }
 
     private void stopDump() {
         if (null != BlockCanaryInternals.getInstance().stackSampler) {
+            //结束堆栈采样
             BlockCanaryInternals.getInstance().stackSampler.stop();
         }
 
         if (null != BlockCanaryInternals.getInstance().cpuSampler) {
+            //结束cpu采样
             BlockCanaryInternals.getInstance().cpuSampler.stop();
         }
     }

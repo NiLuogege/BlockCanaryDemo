@@ -15,21 +15,27 @@
  */
 package com.github.moduth.blockcanary;
 
+import android.util.Log;
+
 import com.github.moduth.blockcanary.internal.BlockInfo;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+
 
 /**
  * Dumps thread stack.
  */
 class StackSampler extends AbstractSampler {
 
-    //最大的 存储个数？？？
+    private static final String TAG = "StackSampler";
+
+    //sStackMap 的最大容量，默认 100个
     private static final int DEFAULT_MAX_ENTRY_COUNT = 100;
     private static final LinkedHashMap<Long, String> sStackMap = new LinkedHashMap<>();
 
     private int mMaxEntryCount = DEFAULT_MAX_ENTRY_COUNT;
+    //主线程
     private Thread mCurrentThread;
 
     public StackSampler(Thread thread, //主线程也就是 ui线程
@@ -48,6 +54,7 @@ class StackSampler extends AbstractSampler {
         ArrayList<String> result = new ArrayList<>();
         synchronized (sStackMap) {
             for (Long entryTime : sStackMap.keySet()) {
+                //获取所有 开始时间和结束结束时间之内的 堆栈
                 if (startTime < entryTime && entryTime < endTime) {
                     result.add(BlockInfo.TIME_FORMATTER.format(entryTime)
                             + BlockInfo.SEPARATOR
@@ -63,6 +70,8 @@ class StackSampler extends AbstractSampler {
     protected void doSample() {
         StringBuilder stringBuilder = new StringBuilder();
 
+
+        //获取主线程堆栈， mCurrentThread 是主线程，构造方法中传进来的
         for (StackTraceElement stackTraceElement : mCurrentThread.getStackTrace()) {
             stringBuilder
                     .append(stackTraceElement.toString())
@@ -70,10 +79,15 @@ class StackSampler extends AbstractSampler {
         }
 
         synchronized (sStackMap) {
+            //容量满了就随便删一个
             if (sStackMap.size() == mMaxEntryCount && mMaxEntryCount > 0) {
                 sStackMap.remove(sStackMap.keySet().iterator().next());
             }
+
+            //记录当前时间和堆栈的关系
             sStackMap.put(System.currentTimeMillis(), stringBuilder.toString());
+
+            Log.e(TAG,"currentTime= "+System.currentTimeMillis() +"\n stackTrace="+stringBuilder.toString());
         }
     }
 }

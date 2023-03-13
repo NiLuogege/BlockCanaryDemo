@@ -99,6 +99,9 @@ class CpuSampler extends AbstractSampler {
         return false;
     }
 
+    /**
+     * 开始采样
+     */
     @Override
     protected void doSample() {
         BufferedReader cpuReader = null;

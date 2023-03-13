@@ -27,6 +27,7 @@ abstract class AbstractSampler {
     private static final int DEFAULT_SAMPLE_INTERVAL = 300;
 
     protected AtomicBoolean mShouldSample = new AtomicBoolean(false);
+    //采样间隔
     protected long mSampleInterval;
 
     private Runnable mRunnable = new Runnable() {
@@ -35,6 +36,7 @@ abstract class AbstractSampler {
             doSample();
 
             if (mShouldSample.get()) {
+                //发起循环，进行采样，每次间隔 mSampleInterval
                 HandlerThreadFactory.getTimerThreadHandler()
                         .postDelayed(mRunnable, mSampleInterval);
             }
@@ -56,6 +58,7 @@ abstract class AbstractSampler {
         mShouldSample.set(true);
 
         HandlerThreadFactory.getTimerThreadHandler().removeCallbacks(mRunnable);
+        //开始采样，为啥要延时呢？
         HandlerThreadFactory.getTimerThreadHandler().postDelayed(mRunnable,
                 BlockCanaryInternals.getInstance().getSampleDelay());
     }
