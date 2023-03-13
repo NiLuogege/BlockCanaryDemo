@@ -60,8 +60,11 @@ public class LogWriter {
 
     /**
      * Delete obsolete log files, which is by default 2 days.
+     *
+     * 删除过时的日志，默认为两天
      */
     public static void cleanObsolete() {
+        //获取 BlockCanary-writer 这个子线程 handler ，
         HandlerThreadFactory.getWriteLogThreadHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -70,6 +73,7 @@ public class LogWriter {
                 if (f != null && f.length > 0) {
                     synchronized (SAVE_DELETE_LOCK) {
                         for (File aF : f) {
+                            //最后修改时间 》 两天就删除掉
                             if (now - aF.lastModified() > OBSOLETE_DURATION) {
                                 aF.delete();
                             }

@@ -86,6 +86,7 @@ public final class BlockCanaryInternals {
             }
         }, getContext().provideBlockThreshold(), getContext().stopWhenDebugging()));
 
+        //删除两天前的过时文件
         LogWriter.cleanObsolete();
     }
 

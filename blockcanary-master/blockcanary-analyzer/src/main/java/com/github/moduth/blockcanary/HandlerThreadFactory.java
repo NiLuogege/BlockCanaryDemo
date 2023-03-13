@@ -35,6 +35,7 @@ final class HandlerThreadFactory {
         return sWriteLogThread.getHandler();
     }
 
+    //用于包装 HandlerThread(子线程handler)
     private static class HandlerThreadWrapper {
         private Handler handler = null;
 
