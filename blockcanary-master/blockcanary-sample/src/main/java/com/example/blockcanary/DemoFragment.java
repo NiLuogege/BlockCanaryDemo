@@ -16,6 +16,7 @@
 package com.example.blockcanary;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -92,6 +93,7 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.tv_title:
                 System.out.println("hulahula ");
+                startActivity(new Intent(getContext(),DisplayActivity.class));
                 break;
             case R.id.button1:
                 try {
