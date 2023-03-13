@@ -62,11 +62,13 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        View tvTitle = (View) view.findViewById(R.id.tv_title);
         Button button1 = (Button) view.findViewById(R.id.button1);
         Button button2 = (Button) view.findViewById(R.id.button2);
         Button button3 = (Button) view.findViewById(R.id.button3);
         Button button4 = (Button) view.findViewById(R.id.button4);
 
+        tvTitle.setOnClickListener(this);
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
@@ -88,6 +90,9 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.tv_title:
+                System.out.println("hulahula ");
+                break;
             case R.id.button1:
                 try {
                     Thread.sleep(2000);
@@ -131,7 +136,7 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
 
                 long endTime2 = SystemClock.currentThreadTimeMillis();
 
-                Log.e(TAG, "common method cose time = " + (endTime2 - startTime1) + " isEnabled="+isEnabled);
+                Log.e(TAG, "common method cose time = " + (endTime2 - startTime1) + " isEnabled=" + isEnabled);
 
                 break;
             default:
