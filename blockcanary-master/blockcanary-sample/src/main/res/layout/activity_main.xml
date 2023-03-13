@@ -86,7 +86,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/btn_select"
                 android:gravity="center"
-                android:text="@string/more"
+                android:text="测试 Binder调用和一般方法执行时间对比"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"/>
         </LinearLayout>

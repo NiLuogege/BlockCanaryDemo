@@ -63,6 +63,8 @@ import static android.view.View.VISIBLE;
 
 /**
  * Display blocks.
+ *
+ * 用于显示 具体堆栈的核心信息的Activity，就是 点击消息弹窗后显示的那个
  */
 public class DisplayActivity extends Activity {
 

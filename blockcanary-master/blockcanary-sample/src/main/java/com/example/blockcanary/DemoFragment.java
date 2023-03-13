@@ -15,7 +15,10 @@
  */
 package com.example.blockcanary;
 
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -24,8 +27,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.github.moduth.blockcanary.ui.DisplayActivity;
+
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+import static android.content.pm.PackageManager.DONT_KILL_APP;
 
 /**
  * 用于模拟主线程阻塞的
@@ -33,6 +42,7 @@ import java.io.IOException;
 public class DemoFragment extends Fragment implements View.OnClickListener {
 
     private static final String DEMO_FRAGMENT = "DemoFragment";
+    private static final String TAG = "DemoFragment";
 
     public static DemoFragment newInstance() {
         return new DemoFragment();
@@ -55,10 +65,12 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
         Button button1 = (Button) view.findViewById(R.id.button1);
         Button button2 = (Button) view.findViewById(R.id.button2);
         Button button3 = (Button) view.findViewById(R.id.button3);
+        Button button4 = (Button) view.findViewById(R.id.button4);
 
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
+        button4.setOnClickListener(this);
     }
 
     @Override
@@ -70,6 +82,8 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
+
+    private boolean isEnabled = false;
 
     @Override
     public void onClick(View v) {
@@ -90,6 +104,35 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
             case R.id.button3:
                 double result = compute();
                 System.out.println(result);
+                break;
+            case R.id.button4:
+
+                long startTime = SystemClock.currentThreadTimeMillis();
+
+                for (int i = 0; i < 10; i++) {
+                    ComponentName component = new ComponentName(getContext(), DisplayActivity.class);
+                    PackageManager packageManager = getContext().getPackageManager();
+                    int newState = isEnabled ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED;
+                    // Blocks on IPC.
+                    // 设置 componentClass 是否可用 ，
+                    packageManager.setComponentEnabledSetting(component, newState, DONT_KILL_APP);
+                }
+
+                long endTime = SystemClock.currentThreadTimeMillis();
+
+                Log.e(TAG, "ipc method cose time = " + (endTime - startTime));
+
+
+                long startTime1 = SystemClock.currentThreadTimeMillis();
+
+                for (int i = 0; i < 10; i++) {
+                    isEnabled = !isEnabled;
+                }
+
+                long endTime2 = SystemClock.currentThreadTimeMillis();
+
+                Log.e(TAG, "common method cose time = " + (endTime2 - startTime1) + " isEnabled="+isEnabled);
+
                 break;
             default:
                 break;

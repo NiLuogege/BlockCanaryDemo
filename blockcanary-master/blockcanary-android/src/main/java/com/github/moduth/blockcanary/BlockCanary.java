@@ -59,7 +59,9 @@ public final class BlockCanary {
     public static BlockCanary install(Context context, BlockCanaryContext blockCanaryContext) {
         //初始化，只是在 BlockCanaryContext中保存了 Context 和 用于自定义的 BlockCanaryContext
         BlockCanaryContext.init(context, blockCanaryContext);
+        //设置 推送是否可用
         setEnabled(context, DisplayActivity.class, BlockCanaryContext.get().displayNotification());
+        //返回单里的 BlockCanary
         return get();
     }
 
@@ -133,15 +135,23 @@ public final class BlockCanary {
     }
 
     // these lines are originally copied from LeakCanary: Copyright (C) 2015 Square, Inc.
+    // 创建一个单线程的线程池 ，名为 File-IO
     private static final Executor fileIoExecutor = newSingleThreadExecutor("File-IO");
 
+    /**
+     * 这个设置 还在子线程中设置？  这个方法这么耗时吗？
+     *
+     * 原因 源码注释行已经说了 Blocks on IPC. 也就是说会被IPC阻塞，所以这里在子线程中调用，草 真他妈细
+     */
     private static void setEnabledBlocking(Context appContext,
-                                           Class<?> componentClass,
-                                           boolean enabled) {
+                                           Class<?> componentClass,//显示具体堆栈的Activity
+                                           boolean enabled//是否显示 Notification
+    ) {
         ComponentName component = new ComponentName(appContext, componentClass);
         PackageManager packageManager = appContext.getPackageManager();
         int newState = enabled ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED;
         // Blocks on IPC.
+        // 设置 componentClass 是否可用 ，
         packageManager.setComponentEnabledSetting(component, newState, DONT_KILL_APP);
     }
     // end of lines copied from LeakCanary
@@ -155,12 +165,14 @@ public final class BlockCanary {
     }
 
     private static void setEnabled(Context context,
-                                   final Class<?> componentClass,
-                                   final boolean enabled) {
+                                   final Class<?> componentClass,//显示具体堆栈的Activity
+                                   final boolean enabled //是否显示 Notification
+    ) {
         final Context appContext = context.getApplicationContext();
         executeOnFileIoThread(new Runnable() {
             @Override
             public void run() {
+                //在 File-IO 线程中执行 setEnabledBlocking
                 setEnabledBlocking(appContext, componentClass, enabled);
             }
         });
