@@ -23,11 +23,15 @@ class LooperMonitor implements Printer {
 
     private static final int DEFAULT_BLOCK_THRESHOLD_MILLIS = 3000;
 
+    //卡顿的阀值， 当超过这个会被认为为卡段，BlockCanaryContext中默认为 1s
     private long mBlockThresholdMillis = DEFAULT_BLOCK_THRESHOLD_MILLIS;
     private long mStartTimestamp = 0;
     private long mStartThreadTimestamp = 0;
-    private BlockListener mBlockListener = null;
     private boolean mPrintingStarted = false;
+
+    //卡顿回调
+    private BlockListener mBlockListener = null;
+    //在调试模式下是否停止 检测，默认为 true
     private final boolean mStopWhenDebugging;
 
     public interface BlockListener {
@@ -37,7 +41,10 @@ class LooperMonitor implements Printer {
                           long threadTimeEnd);
     }
 
-    public LooperMonitor(BlockListener blockListener, long blockThresholdMillis, boolean stopWhenDebugging) {
+    public LooperMonitor(BlockListener blockListener, //卡顿回调
+                         long blockThresholdMillis,//卡顿的阀值， 当超过这个会被认为为卡段，默认为 1s
+                         boolean stopWhenDebugging//在调试模式下是否停止 检测，默认为 true
+    ) {
         if (blockListener == null) {
             throw new IllegalArgumentException("blockListener should not be null.");
         }
@@ -46,6 +53,11 @@ class LooperMonitor implements Printer {
         mStopWhenDebugging = stopWhenDebugging;
     }
 
+    /**
+     * Looper.loop() 方法中在 msg.target.dispatchMessage(msg) 前后， 也就是在 主线程执行具体代码 的前后
+     * 都会调用 println 方法 ，之前输出的标识为 >>>>>  ，之后输出的标识为 <<<<<
+     *
+     */
     @Override
     public void println(String x) {
         if (mStopWhenDebugging && Debug.isDebuggerConnected()) {

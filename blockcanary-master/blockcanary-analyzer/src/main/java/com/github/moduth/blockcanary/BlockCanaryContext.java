@@ -100,6 +100,8 @@ public class BlockCanaryContext implements BlockInterceptor {
      * Config block threshold (in millis), dispatch over this duration is regarded as a BLOCK. You may set it
      * from performance of device.
      *
+     * 卡顿的阀值， 当超过这个会被认为为卡段，默认为 1s
+     *
      * @return threshold in mills
      */
     public int provideBlockThreshold() {
@@ -209,6 +211,8 @@ public class BlockCanaryContext implements BlockInterceptor {
 
     /**
      * Whether to stop monitoring when in debug mode.
+     *
+     * 在调试模式下是否停止 检测，默认为 true
      *
      * @return true if stop, false otherwise
      */
