@@ -32,6 +32,7 @@ class StackSampler extends AbstractSampler {
 
     //sStackMap 的最大容量，默认 100个
     private static final int DEFAULT_MAX_ENTRY_COUNT = 100;
+    //用于存储时间戳和 堆栈的关系
     private static final LinkedHashMap<Long, String> sStackMap = new LinkedHashMap<>();
 
     private int mMaxEntryCount = DEFAULT_MAX_ENTRY_COUNT;

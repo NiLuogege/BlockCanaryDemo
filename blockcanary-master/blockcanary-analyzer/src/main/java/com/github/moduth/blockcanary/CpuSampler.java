@@ -38,8 +38,9 @@ class CpuSampler extends AbstractSampler {
      * TODO: Explain how we define cpu busy in README
      */
     private final int BUSY_TIME;
+    //容量为十个
     private static final int MAX_ENTRY_COUNT = 10;
-
+    //用于存储时间戳和 cup信息的关系
     private final LinkedHashMap<Long, String> mCpuInfoEntries = new LinkedHashMap<>();
     private int mPid = 0;
     private long mUserLast = 0;
@@ -51,6 +52,8 @@ class CpuSampler extends AbstractSampler {
 
     public CpuSampler(long sampleInterval) {
         super(sampleInterval);
+        //采样时间 * 1.2 就是 繁忙时间
+        // mSampleInterval 默认为 1s
         BUSY_TIME = (int) (mSampleInterval * 1.2f);
     }
 
@@ -63,6 +66,8 @@ class CpuSampler extends AbstractSampler {
     /**
      * Get cpu rate information
      *
+     * 获取cpu 使用率
+     *  这是吧记录的cup的信息都给 输出了
      * @return string show cpu rate information
      */
     public String getCpuRateInfo() {
@@ -81,13 +86,17 @@ class CpuSampler extends AbstractSampler {
 
     public boolean isCpuBusy(long start, long end) {
         if (end - start > mSampleInterval) {
+            //向前向后各扩展一个采样时间
+            //采样时间默认为 1s
             long s = start - mSampleInterval;
             long e = start + mSampleInterval;
             long last = 0;
             synchronized (mCpuInfoEntries) {
                 for (Map.Entry<Long, String> entry : mCpuInfoEntries.entrySet()) {
                     long time = entry.getKey();
+                    //
                     if (s < time && time < e) {
+                        //两个采样点的时间 大于 BUSY_TIME 就说明是 cup繁忙？？？
                         if (last != 0 && time - last > BUSY_TIME) {
                             return true;
                         }
@@ -110,6 +119,7 @@ class CpuSampler extends AbstractSampler {
         try {
             cpuReader = new BufferedReader(new InputStreamReader(
                     new FileInputStream("/proc/stat")), BUFFER_SIZE);
+            //整体cpu使用率
             String cpuRate = cpuReader.readLine();
             if (cpuRate == null) {
                 cpuRate = "";
@@ -120,11 +130,13 @@ class CpuSampler extends AbstractSampler {
             }
             pidReader = new BufferedReader(new InputStreamReader(
                     new FileInputStream("/proc/" + mPid + "/stat")), BUFFER_SIZE);
+            //当前app cup使用率
             String pidCpuRate = pidReader.readLine();
             if (pidCpuRate == null) {
                 pidCpuRate = "";
             }
 
+            //解析
             parse(cpuRate, pidCpuRate);
         } catch (Throwable throwable) {
             Log.e(TAG, "doSample: ", throwable);
@@ -151,12 +163,16 @@ class CpuSampler extends AbstractSampler {
         mAppCpuTimeLast = 0;
     }
 
+    /**
+     * 参考：https://www.cnblogs.com/aziji/articles/9634960.html
+     */
     private void parse(String cpuRate, String pidCpuRate) {
         String[] cpuInfoArray = cpuRate.split(" ");
         if (cpuInfoArray.length < 9) {
             return;
         }
 
+        //分别读出这几个时间 这些是证系统的cup使用率
         long user = Long.parseLong(cpuInfoArray[2]);
         long nice = Long.parseLong(cpuInfoArray[3]);
         long system = Long.parseLong(cpuInfoArray[4]);
@@ -171,6 +187,7 @@ class CpuSampler extends AbstractSampler {
             return;
         }
 
+        //这个是app的cup使用时间
         long appCpuTime = Long.parseLong(pidCpuInfoList[13])
                 + Long.parseLong(pidCpuInfoList[14])
                 + Long.parseLong(pidCpuInfoList[15])
@@ -183,21 +200,23 @@ class CpuSampler extends AbstractSampler {
 
             stringBuilder
                     .append("cpu:")
-                    .append((totalTime - idleTime) * 100L / totalTime)
+                    .append((totalTime - idleTime) * 100L / totalTime) //cup 总的使用率
                     .append("% ")
                     .append("app:")
-                    .append((appCpuTime - mAppCpuTimeLast) * 100L / totalTime)
+                    .append((appCpuTime - mAppCpuTimeLast) * 100L / totalTime) //app cup 使用率
                     .append("% ")
                     .append("[")
-                    .append("user:").append((user - mUserLast) * 100L / totalTime)
+                    .append("user:").append((user - mUserLast) * 100L / totalTime) // 用户态使用率
                     .append("% ")
-                    .append("system:").append((system - mSystemLast) * 100L / totalTime)
+                    .append("system:").append((system - mSystemLast) * 100L / totalTime) //内核态使用率
                     .append("% ")
-                    .append("ioWait:").append((ioWait - mIoWaitLast) * 100L / totalTime)
+                    .append("ioWait:").append((ioWait - mIoWaitLast) * 100L / totalTime)// io等待率
                     .append("% ]");
 
             synchronized (mCpuInfoEntries) {
+                //时间戳和 cup信息存起来
                 mCpuInfoEntries.put(System.currentTimeMillis(), stringBuilder.toString());
+                //超过容量就删一个
                 if (mCpuInfoEntries.size() > MAX_ENTRY_COUNT) {
                     for (Map.Entry<Long, String> entry : mCpuInfoEntries.entrySet()) {
                         Long key = entry.getKey();
