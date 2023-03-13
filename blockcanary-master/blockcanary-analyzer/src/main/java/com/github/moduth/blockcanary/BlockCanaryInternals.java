@@ -77,6 +77,7 @@ public final class BlockCanaryInternals {
                     LogWriter.save(blockInfo.toString());
 
                     //回调各个拦截器的 onBlock 方法并传入生成的 BlockInfo
+                    //包括会发送推送的 DisplayService
                     if (mInterceptorChain.size() != 0) {
                         for (BlockInterceptor interceptor : mInterceptorChain) {
                             interceptor.onBlock(getContext().provideContext(), blockInfo);

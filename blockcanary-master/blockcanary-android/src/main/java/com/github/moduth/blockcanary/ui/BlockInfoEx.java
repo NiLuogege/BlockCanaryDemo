@@ -21,6 +21,8 @@ final class BlockInfoEx extends BlockInfo {
      *
      * @param file looper log file
      * @return LooperLog created from log file
+     *
+     * 通过 log 获取创建一个
      */
     public static BlockInfoEx newInstance(File file) {
         BlockInfoEx blockInfo = new BlockInfoEx();

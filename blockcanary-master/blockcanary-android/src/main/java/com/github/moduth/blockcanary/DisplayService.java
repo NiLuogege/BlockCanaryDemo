@@ -40,7 +40,9 @@ final class DisplayService implements BlockInterceptor {
 
     @Override
     public void onBlock(Context context, BlockInfo blockInfo) {
+        //发送一个对宋
         Intent intent = new Intent(context, DisplayActivity.class);
+        //记录 卡顿发送前的时间 timeStart
         intent.putExtra("show_latest", blockInfo.timeStart);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, FLAG_UPDATE_CURRENT);

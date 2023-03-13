@@ -95,6 +95,7 @@ public class DisplayActivity extends Activity {
         if (savedInstanceState != null) {
             mBlockStartTime = savedInstanceState.getString(SHOW_BLOCK_EXTRA_KEY);
         } else {
+            //获取传递过来的起始时间
             Intent intent = getIntent();
             if (intent.hasExtra(SHOW_BLOCK_EXTRA)) {
                 mBlockStartTime = intent.getStringExtra(SHOW_BLOCK_EXTRA);
@@ -228,6 +229,7 @@ public class DisplayActivity extends Activity {
         }
     }
 
+    //显示列表
     private void renderBlockList() {
         ListAdapter listAdapter = mListView.getAdapter();
         if (listAdapter instanceof BlockListAdapter) {
@@ -275,6 +277,7 @@ public class DisplayActivity extends Activity {
         mActionButton.setVisibility(mBlockInfoEntries.isEmpty() ? GONE : VISIBLE);
     }
 
+    //显示某一个详情
     private void renderBlockDetail(final BlockInfoEx blockInfo) {
         ListAdapter listAdapter = mListView.getAdapter();
         final DetailAdapter adapter;
