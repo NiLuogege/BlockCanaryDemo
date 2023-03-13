@@ -17,11 +17,13 @@ package com.github.moduth.blockcanary;
 
 import android.os.Debug;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Printer;
 
 class LooperMonitor implements Printer {
 
     private static final int DEFAULT_BLOCK_THRESHOLD_MILLIS = 3000;
+    private static final String TAG = "LooperMonitor";
 
     //卡顿的阀值， 当超过这个会被认为为卡段，BlockCanaryContext中默认为 1s
     private long mBlockThresholdMillis = DEFAULT_BLOCK_THRESHOLD_MILLIS;
@@ -70,6 +72,9 @@ class LooperMonitor implements Printer {
             mStartTimestamp = System.currentTimeMillis();
             mStartThreadTimestamp = SystemClock.currentThreadTimeMillis();
             mPrintingStarted = true;
+
+            Log.e(TAG,"startDump -> "+x);
+
             //在子线程中获取调用栈和CPU信息
             startDump();
         } else {
@@ -81,6 +86,7 @@ class LooperMonitor implements Printer {
                 //回调
                 notifyBlockEvent(endTime);
             }
+            Log.e(TAG,"stopDump -> "+x);
             //停止获取调用栈和CPU信息
             stopDump();
         }

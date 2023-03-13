@@ -59,6 +59,8 @@ abstract class AbstractSampler {
 
         HandlerThreadFactory.getTimerThreadHandler().removeCallbacks(mRunnable);
         //开始采样，为啥要延时呢？
+        //getSampleDelay是 卡顿阀值*0.8 。 延时的原因是因为避免非耗时方法也会进行采样操作而 浪费资源。 这里会添加一个
+        //延时消息，如果消息在没有达到 卡顿阀值*0.8  的时候就处理完了就会在 本类的 stop() 方法中将 mRunnable 给移除掉
         HandlerThreadFactory.getTimerThreadHandler().postDelayed(mRunnable,
                 BlockCanaryInternals.getInstance().getSampleDelay());
     }

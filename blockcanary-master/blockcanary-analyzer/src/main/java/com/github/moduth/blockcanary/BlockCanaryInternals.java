@@ -128,6 +128,7 @@ public final class BlockCanaryInternals {
     }
 
     //采样延时， 为啥要延时呀？？
+    //可以看到这里延时的时间是 卡顿阀值*0.8 。 延时的原因是因为避免非耗时方法也会进行采样操作而 浪费资源。
     long getSampleDelay() {
         return (long) (BlockCanaryInternals.getContext().provideBlockThreshold() * 0.8f);
     }
